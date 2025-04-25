@@ -3,6 +3,8 @@ import { ErrorMessage, Formik, Form, Field } from "formik";
 import { useId } from "react";
 import * as Yup from "yup";
 import { nanoid } from "nanoid";
+import { useDispatch, useSelector } from "react-redux";
+import { addContact } from "../../redux/contactsSlice";
 
 const ContactFormSchema = Yup.object().shape({
   name: Yup.string()
@@ -24,9 +26,11 @@ const initialValues = {
   number: "",
 };
 
-const ContactForm = ({ onAdd, contacts }) => {
+const ContactForm = () => {
   const nameFieldId = useId();
   const numberFieldId = useId();
+  const dispatch = useDispatch();
+  const contacts = useSelector((state) => state.contacts.items);
 
   const handleSubmit = (values, actions) => {
     const isDuplicate = contacts.some(
@@ -37,11 +41,13 @@ const ContactForm = ({ onAdd, contacts }) => {
       return;
     }
 
-    onAdd({
-      name: values.name.trim(),
-      number: values.number.trim(),
-      id: nanoid(),
-    });
+    dispatch(
+      addContact({
+        name: values.name.trim(),
+        number: values.number.trim(),
+        id: nanoid(),
+      })
+    );
 
     actions.resetForm();
   };
